@@ -3,6 +3,7 @@ package drand
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	"time"
 
 	ffi "github.com/filecoin-project/filecoin-ffi"
@@ -65,6 +66,7 @@ func (d *Fake) FetchGroupConfig(_ []string, _, _ bool) ([]string, [][]byte, uint
 func roundsInIntervalWhenNoGaps(startTime, endTime time.Time, startTimeOfRound func(Round) time.Time, roundDuration time.Duration) []Round {
 	// Find first round after startTime
 	genesisTime := startTimeOfRound(Round(0))
+	fmt.Printf("supposed genesis time: %v\n", genesisTime)
 	truncatedStartRound := Round(startTime.Sub(genesisTime) / roundDuration)
 	var round Round
 	if startTimeOfRound(truncatedStartRound).Equal(startTime) {

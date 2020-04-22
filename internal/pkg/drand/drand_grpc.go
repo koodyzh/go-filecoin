@@ -205,6 +205,7 @@ func (d *GRPC) StartTimeOfRound(round Round) time.Time {
 // 3. There is a network partition blocking this GPRC from the latest rounds
 func (d *GRPC) RoundsInInterval(ctx context.Context, startTime, endTime time.Time) ([]Round, error) {
 	idealRounds := roundsInIntervalWhenNoGaps(startTime, endTime, d.StartTimeOfRound, d.roundTime)
+	fmt.Printf("idealRounds: %v\n", idealRounds)
 	if len(idealRounds) == 0 { // exit early if no rounds possible
 		return []Round{}, nil
 	}

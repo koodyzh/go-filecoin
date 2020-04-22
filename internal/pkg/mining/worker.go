@@ -6,6 +6,7 @@ package mining
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	address "github.com/filecoin-project/go-address"
@@ -368,6 +369,7 @@ func (w *DefaultWorker) drandEntriesForEpoch(ctx context.Context, base block.Tip
 		// and then we grab everything between this round and genesis time
 		startTime := w.drand.StartTimeOfRound(w.drand.FirstFilecoinRound())
 		endTime := w.clock.StartTimeOfEpoch(0)
+		fmt.Printf("[startTime, endTime]: [%v, %v]\n", startTime, endTime)
 		rounds, err = w.drand.RoundsInInterval(ctx, startTime, endTime)
 		if err != nil {
 			return nil, err
