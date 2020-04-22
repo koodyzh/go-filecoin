@@ -3,6 +3,7 @@ package drand
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/drand/drand/beacon"
@@ -72,6 +73,7 @@ func (d *GRPC) ReadEntry(ctx context.Context, drandRound Round) (*Entry, error) 
 	if entry, ok := d.cache[drandRound]; ok {
 		return entry, nil
 	}
+	fmt.Printf("looking for drand round: %d\n", drandRound)
 
 	// try each address, stopping when we have a key
 	for _, addr := range d.addresses {
