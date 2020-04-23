@@ -244,6 +244,9 @@ func (f FiniteStateMachineNodeConnector) ChainGetTicket(ctx context.Context, tok
 
 	buf := new(bytes.Buffer)
 	err = f.minerAddr.MarshalCBOR(buf)
+	if err != nil {
+		return abi.SealRandomness{}, 0, err
+	}
 
 	randomness, err := f.ChainGetRandomness(ctx, tok, crypto.DomainSeparationTag_SealRandomness, randomEpoch, buf.Bytes())
 	return abi.SealRandomness(randomness), randomEpoch, err
