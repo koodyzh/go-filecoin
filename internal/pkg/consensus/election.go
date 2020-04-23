@@ -3,6 +3,7 @@ package consensus
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"math/big"
 
 	address "github.com/filecoin-project/go-address"
@@ -51,6 +52,7 @@ func (em ElectionMachine) GenerateElectionProof(ctx context.Context, entry *dran
 func (em ElectionMachine) GenerateWinningPoSt(ctx context.Context, allSectorInfos []abi.SectorInfo, entry *drand.Entry, epoch abi.ChainEpoch, ep postgenerator.PoStGenerator, maddr address.Address) ([]block.PoStProof, error) {
 	minerIDuint64, err := address.IDFromAddress(maddr)
 	if err != nil {
+		fmt.Printf("a\n")
 		return nil, err
 	}
 	minerID := abi.ActorID(minerIDuint64)
@@ -58,22 +60,26 @@ func (em ElectionMachine) GenerateWinningPoSt(ctx context.Context, allSectorInfo
 	seed := blake2b.Sum256(entry.Signature)
 	randomness, err := crypto.BlendEntropy(acrypto.DomainSeparationTag_ElectionPoStChallengeSeed, seed[:], epoch, []byte{})
 	if err != nil {
+		fmt.Printf("b\n")
 		return nil, err
 	}
 	poStRandomness := abi.PoStRandomness(randomness)
 
 	rp, err := allSectorInfos[0].RegisteredProof.RegisteredWinningPoStProof()
 	if err != nil {
+		fmt.Printf("c\n")
 		return nil, err
 	}
 	challengeIndexes, err := ffiwrapper.ProofVerifier.GenerateWinningPoStSectorChallenge(ctx, rp, minerID, poStRandomness, uint64(len(allSectorInfos)))
 	if err != nil {
+		fmt.Printf("d\n")
 		return nil, err
 	}
 	challengedSectorInfos := filterSectorInfosByIndex(allSectorInfos, challengeIndexes)
 
 	posts, err := ep.GenerateWinningPoSt(ctx, minerID, challengedSectorInfos, poStRandomness)
 	if err != nil {
+		fmt.Printf("e\n")
 		return nil, err
 	}
 
