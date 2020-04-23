@@ -1,6 +1,7 @@
 package fsmnodeconnector
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -26,6 +27,7 @@ import (
 )
 
 type FiniteStateMachineNodeConnector struct {
+	minerAddr   address.Address
 	waiter      *msg.Waiter
 	chain       *chain.Store
 	chainState  *cst.ChainStateReadWriter
@@ -35,8 +37,9 @@ type FiniteStateMachineNodeConnector struct {
 
 var _ fsm.SealingAPI = new(FiniteStateMachineNodeConnector)
 
-func New(waiter *msg.Waiter, chain *chain.Store, viewer *appstate.TipSetStateViewer, outbox *message.Outbox, chainState *cst.ChainStateReadWriter) FiniteStateMachineNodeConnector {
+func New(minerAddr address.Address, waiter *msg.Waiter, chain *chain.Store, viewer *appstate.TipSetStateViewer, outbox *message.Outbox, chainState *cst.ChainStateReadWriter) FiniteStateMachineNodeConnector {
 	return FiniteStateMachineNodeConnector{
+		minerAddr:   minerAddr,
 		chain:       chain,
 		chainState:  chainState,
 		outbox:      outbox,
@@ -239,7 +242,10 @@ func (f FiniteStateMachineNodeConnector) ChainGetTicket(ctx context.Context, tok
 
 	randomEpoch := epoch - miner.ChainFinalityish
 
-	randomness, err := f.ChainGetRandomness(ctx, tok, crypto.DomainSeparationTag_SealRandomness, randomEpoch, nil)
+	buf := new(bytes.Buffer)
+	err = f.minerAddr.MarshalCBOR(buf)
+
+	randomness, err := f.ChainGetRandomness(ctx, tok, crypto.DomainSeparationTag_SealRandomness, randomEpoch, buf.Bytes())
 	return abi.SealRandomness(randomness), randomEpoch, err
 }
 
