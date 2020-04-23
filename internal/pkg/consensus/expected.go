@@ -2,6 +2,7 @@ package consensus
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"time"
 
@@ -356,6 +357,12 @@ func (c *Expected) validateDRANDEntries(ctx context.Context, blk *block.Block) e
 	lastRound := blk.DrandEntries[numEntries-1].Round
 	nextDRANDTime := c.drand.StartTimeOfRound(lastRound + 1)
 	if !(c.clock.EpochAtTime(nextDRANDTime) > targetEpoch) {
+		fmt.Printf("len of entries: %d\n", numEntries)
+		fmt.Printf("first round: %d\n", blk.DrandEntries[0])
+		fmt.Printf("last round: %d\n", lastRound)
+		fmt.Printf("nextDRANDTime: %v\n", nextDRANDTime)
+		fmt.Printf("Filecoin epoch at next drand time: %d\n", c.clock.EpochAtTime(nextDRANDTime))
+		fmt.Printf("Filecoin epoch at last drand time: %d\n", c.clock.EpochAtTime(c.drand.StartTimeOfRound(lastRound)))
 		return errors.New("Block does not include all drand entries required")
 	}
 
